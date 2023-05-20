@@ -1,0 +1,516 @@
+#transition:sm.FadeTransition(duration=.0)
+
+ScreenManager
+    id:manager
+    MDScreen:
+        on_enter:
+            app.display_student()
+        name:"inclass"
+        MDBoxLayout:
+            orientation: "vertical"
+            MDTopAppBar:
+                title: "class name"
+                specific_text_color:78/255, 82/255, 84/255, 1
+                md_bg_color:1, 1, 1, 1
+                right_action_items: [["segment", lambda x: app.screen_capture("activity")]]
+
+            MDTabs:
+                allow_stretch:False
+                background_color:1, 1, 1, 1
+                indicator_color:36/255, 146/255, 255/255, 1
+                tab_hint_x:True
+                text_color_active:78/255, 82/255, 84/255, 1
+                text_color_normal:.5, .5, .5, 1
+
+                Tab:
+                    title: "Student"
+                    FloatLayout:
+                        RecycleView:
+                            id: studs
+                            key_viewclass: 'viewclass'
+                            key_size: 'height'
+                            pos_hint:{"top":.99}
+                            RecycleBoxLayout:
+                                id:wali
+                                spacing:dp(4)
+                                padding: dp(10)
+                                default_size: None, dp(55)
+                                default_size_hint: 1, None
+                                size_hint_y: None
+                                height: self.minimum_height
+                                orientation: 'vertical'
+
+                        MDIconButton:
+                            icon:"account-plus"
+                            pos_hint:{"center_x":.89,"center_y":.1}
+                            user_font_size:"55sp"
+                            theme_text_color: "Custom"
+                            text_color: 1,1,1,1
+                            md_bg_color: 36/255, 146/255, 255/255, 1
+                            on_release:
+                                app.screen_capture("student")
+                Tab:
+                    title: "Attendence"
+                    FloatLayout:
+                        RecycleView:
+                            id: attend
+                            key_viewclass: 'viewclass'
+                            key_size: 'height'
+                            pos_hint:{"top":.99}
+                            RecycleBoxLayout:
+                                id:wali
+                                spacing:dp(4)
+                                padding: dp(10)
+                                default_size: None, dp(55)
+                                default_size_hint: 1, None
+                                size_hint_y: None
+                                height: self.minimum_height
+                                orientation: 'vertical'
+
+
+    MDScreen:
+        name:"activity"
+        MDBoxLayout:
+            orientation: "vertical"
+            MDTopAppBar:
+                title: "Activities"
+                specific_text_color:78/255, 82/255, 84/255, 1
+                md_bg_color:1, 1, 1, 1
+
+
+            MDTabs:
+                allow_stretch:False
+                background_color:1, 1, 1, 1
+                indicator_color:36/255, 146/255, 255/255, 1
+                tab_hint_x:True
+                text_color_active:78/255, 82/255, 84/255, 1
+                text_color_normal:.5, .5, .5, 1
+
+                Tab:
+                    title: "Homework"
+                    FloatLayout:
+                        MDLabel:
+                            bold:True
+                            text:'Today Homework'
+                            halign:"center"
+                            font_style:'H6'
+                            pos_hint:{'center_x':.5, 'center_y':.9}
+                            theme_text_color: "Custom"
+                            text_color: 83 / 225, 186 / 225, 115 / 225, 1
+                            height: self.texture_size[1]
+                            width: self.texture_size[1]
+                        MDTextField:
+                            id:cls
+                            mode: "rectangle"
+                            fill_color: 0, 0, 0, .4
+                            size_hint: .6, .1
+                            pos_hint:{'center_x':.5, 'center_y':.8}
+                            hint_text:"Class Name:"
+                            text_color: 0, 0, 0, 1
+                            font_size: dp(15)
+                        MDTextField:
+                            id:work
+                            mode: "rectangle"
+                            fill_color: 0, 0, 0, .4
+                            size_hint: .6, .1
+                            pos_hint:{'center_x':.5, 'center_y':.67}
+                            hint_text:"subject: Math, Eng"
+                            text_color: 0, 0, 0, 1
+                            font_size: dp(15)
+                        MDFillRoundFlatButton:
+                            text: "Update Homework"
+                            size_hint: .2, .06
+                            pos_hint:{'center_x':.5, 'center_y':.55}
+                            md_bg_color: 83 / 225, 186 / 225, 115 / 225, 1
+                            on_release:
+                                app.upd_homework(cls.text, work.text)
+
+                Tab:
+                    title: "Result"
+                    FloatLayout:
+
+
+
+    MDScreen:
+        name:'home'
+        FloatLayout:
+            orientation:'vertical'
+            MDLabel:
+                bold:True
+                text:'Create Class'
+                halign:"center"
+                font_style:'H6'
+                pos_hint:{'center_x':.5, 'center_y':.8}
+                theme_text_color: "Custom"
+                text_color: 83 / 225, 186 / 225, 115 / 225, 1
+                height: self.texture_size[1]
+                width: self.texture_size[1]
+            MDTextField:
+                id:name
+                mode: "rectangle"
+                fill_color: 0, 0, 0, .4
+                size_hint: .8, .1
+                pos_hint:{'center_x':.5, 'center_y':.7}
+                hint_text:"Class Name:"
+                text_color: 0, 0, 0, 1
+                font_size: dp(20)
+                on_text:
+                    app.class_name = name.text
+            MDFillRoundFlatButton:
+                text: "Add"
+                size_hint: .2, .06
+                pos_hint:{'center_x':.5, 'center_y':.6}
+                md_bg_color: 83 / 225, 186 / 225, 115 / 225, 1
+                on_release:
+                    app.screen_capture("class")
+                    app.add_class(name.text)
+
+
+    MDScreen:
+        name:'register'
+        FloatLayout:
+            orientation:'vertical'
+            MDTopAppBar:
+                title: "School Diary"
+                pos_hint:{'center_x':.5, 'center_y':.96}
+            MDLabel:
+                bold:True
+                text:'CREATE ACCOUNT'
+                halign:"center"
+                font_style:'H6'
+                pos_hint:{'center_x':.5, 'center_y':.8}
+                theme_text_color: "Custom"
+                text_color: 83 / 225, 186 / 225, 115 / 225, 1
+                height: self.texture_size[1]
+                width: self.texture_size[1]
+            NumberOnlyField:
+                id:number
+                mode: "rectangle"
+                fill_color: 0, 0, 0, .4
+                size_hint: .8, .1
+                hint_text:"Phone number:"
+                pos_hint:{'center_x':.5, 'center_y':.73}
+                text_color: 0, 0, 0, 1
+                font_size: dp(25)
+            MDTextField:
+                id:username
+                mode: "rectangle"
+                fill_color: 0, 0, 0, .4
+                size_hint: .8, .1
+                pos_hint:{'center_x':.5, 'center_y':.58}
+                hint_text:"Password:"
+                password: True
+                text_color: 0, 0, 0, 1
+                font_size: dp(25)
+            MDFillRoundFlatButton:
+                id:t_register
+                text: "Verify & Register"
+                size_hint: .5, .06
+                pos_hint:{'center_x':.5, 'center_y':.35}
+                md_bg_color: 83 / 225, 186 / 225, 115 / 225, 1
+                on_release:
+                    app.validate_user(number.text, username.text)
+
+
+    MDScreen:
+        name:'student'
+        MDBoxLayout:
+            orientation: "vertical"
+            MDTabs:
+                allow_stretch:False
+                background_color:1, 1, 1, 1
+                indicator_color:36/255, 146/255, 255/255, 1
+                tab_hint_x:True
+                text_color_active:78/255, 82/255, 84/255, 1
+                text_color_normal:.5, .5, .5, 1
+
+                Tab:
+                    title: "Search student"
+                    FloatLayout:
+                        MDLabel:
+                            bold:True
+                            text:'Search student'
+                            halign:"center"
+                            font_style:'H6'
+                            pos_hint:{'center_x':.5, 'center_y':.9}
+                            theme_text_color: "Custom"
+                            text_color: 83 / 225, 186 / 225, 115 / 225, 1
+                            height: self.texture_size[1]
+                            width: self.texture_size[1]
+                        MDTextField:
+                            id:student
+                            mode: "rectangle"
+                            fill_color: 0, 0, 0, .4
+                            size_hint: .8, .1
+                            pos_hint:{'center_x':.5, 'center_y':.8}
+                            hint_text:"Student ID:"
+                            text_color: 0, 0, 0, 1
+                            font_size: dp(18)
+                        MDFillRoundFlatButton:
+                            text: "Search"
+                            size_hint: .2, .06
+                            pos_hint:{'center_x':.5, 'center_y':.65}
+                            md_bg_color: 83 / 225, 186 / 225, 115 / 225, 1
+                            on_release:
+                                app.screen_capture("inclass")
+
+
+
+                Tab:
+                    title: "Add new student"
+                    FloatLayout:
+                        MDLabel:
+                            bold:True
+                            text:'Add new student'
+                            halign:"center"
+                            font_style:'H6'
+                            pos_hint:{'center_x':.5, 'center_y':.9}
+                            theme_text_color: "Custom"
+                            text_color: 83 / 225, 186 / 225, 115 / 225, 1
+                            height: self.texture_size[1]
+                            width: self.texture_size[1]
+
+                        MDFillRoundFlatButton:
+                            text: "Generate ID"
+                            size_hint: .2, .06
+                            pos_hint:{'center_x':.3, 'center_y':.8}
+                            md_bg_color: 83 / 225, 186 / 225, 115 / 225, 1
+                            on_release:
+                                app.id_generator()
+
+                        MDLabel:
+                            id:idd
+                            bold:True
+                            text:app.student_id
+                            halign:"center"
+                            pos_hint:{'center_x':.65, 'center_y':.8}
+                            theme_text_color: "Custom"
+                            text_color: 83 / 225, 186 / 225, 115 / 225, 1
+                            height: self.texture_size[1]
+                            width: self.texture_size[1]
+                        MDTextField:
+                            id:level
+                            mode: "rectangle"
+                            fill_color: 0, 0, 0, .4
+                            size_hint: .8, .1
+                            pos_hint:{'center_x':.5, 'center_y':.65}
+                            hint_text:"Class Name:"
+                            text_color: 0, 0, 0, 1
+                            font_size: dp(20)
+
+                        MDTextField:
+                            id:student
+                            mode: "rectangle"
+                            fill_color: 0, 0, 0, .4
+                            size_hint: .8, .1
+                            pos_hint:{'center_x':.5, 'center_y':.5}
+                            hint_text:"Student Name:"
+                            text_color: 0, 0, 0, 1
+                            font_size: dp(20)
+
+                        NumberOnlyField:
+                            id:pphone
+                            mode: "rectangle"
+                            fill_color: 0, 0, 0, .4
+                            size_hint: .8, .1
+                            hint_text:"Parent phone number:"
+                            pos_hint:{'center_x':.5, 'center_y':.35}
+                            text_color: 0, 0, 0, 1
+                            font_size: dp(20)
+
+
+                        MDFillRoundFlatButton:
+                            text: "Add Student"
+                            size_hint: .2, .06
+                            pos_hint:{'center_x':.5, 'center_y':.2}
+                            md_bg_color: 83 / 225, 186 / 225, 115 / 225, 1
+                            on_release:
+                                app.add_student(idd.text, level.text, student.text, pphone.text)
+
+
+    MDScreen:
+        name:'login'
+        FloatLayout:
+            orientation:'vertical'
+            MDTopAppBar:
+                title: "School Diary"
+                pos_hint:{'center_x':.5, 'center_y':.96}
+            MDLabel:
+                bold:True
+                text:'LOGIN'
+                halign:"center"
+                font_style:'H6'
+                pos_hint:{'center_x':.5, 'center_y':.8}
+                theme_text_color: "Custom"
+                text_color: 83 / 225, 186 / 225, 115 / 225, 1
+                height: self.texture_size[1]
+                width: self.texture_size[1]
+            NumberOnlyField:
+                id:phone
+                mode: "rectangle"
+                fill_color: 0, 0, 0, .4
+                size_hint: .8, .1
+                hint_text:"Phone number:"
+                pos_hint:{'center_x':.5, 'center_y':.73}
+                text_color: 0, 0, 0, 1
+                font_size: dp(25)
+            MDTextField:
+                id:pass
+                mode: "rectangle"
+                fill_color: 0, 0, 0, .4
+                size_hint: .8, .1
+                pos_hint:{'center_x':.5, 'center_y':.58}
+                hint_text:"Password:"
+                password: True
+                text_color: 0, 0, 0, 1
+                font_size: dp(25)
+            MDFillRoundFlatButton:
+                id:register
+                text: "Login"
+                size_hint: .5, .06
+                pos_hint:{'center_x':.5, 'center_y':.35}
+                md_bg_color: 83 / 225, 186 / 225, 115 / 225, 1
+                on_release:
+                    app.user_login(phone.text, passe.text)
+
+    MDScreen:
+        name:'Verify'
+        FloatLayout:
+            orientation:'vertical'
+            MDTopAppBar:
+                title: "School Diary"
+                pos_hint:{'center_x':.5, 'center_y':.96}
+            MDLabel:
+                bold:True
+                text:'Enter Verification Code'
+                halign:"center"
+                font_style:'H6'
+                pos_hint:{'center_x':.5, 'center_y':.8}
+                theme_text_color: "Custom"
+                text_color: 83 / 225, 186 / 225, 115 / 225, 1
+                height: self.texture_size[1]
+                width: self.texture_size[1]
+            NumberOnlyField:
+                id:numberv
+                mode: "rectangle"
+                fill_color: 0, 0, 0, .4
+                size_hint: .8, .1
+                hint_text:"6 Digit Code:"
+                pos_hint:{'center_x':.5, 'center_y':.7}
+                text_color: 0, 0, 0, 1
+                font_size: dp(25)
+            MDFillRoundFlatButton:
+                id:b_register
+                text: "Verify"
+                size_hint: .4, .06
+                pos_hint:{'center_x':.5, 'center_y':.55}
+                md_bg_color: 83 / 225, 186 / 225, 115 / 225, 1
+                on_release:
+                    app.verify(numberv.text)
+
+
+
+    MDScreen:
+        name:"genesis"
+        md_bg_color:83 / 225, 186 / 225, 115 / 225, 1
+        MDBoxLayout:
+            orientation:'vertical'
+            MDLabel:
+                text:'School diary'
+                halign:'center'
+                bold:True
+                size_hint:None, None
+                font_style:'H3'
+                size_hint:1, 5
+                theme_text_color: "Custom"
+                text_color: 1, 1, 1, 1
+            MDSpinner:
+                id:spine
+                size_hint: None, None
+                size: dp(40), dp(40)
+                pos_hint: {'center_x': .5, 'center_y': 1}
+                active: True
+                color: 1,1,1,1
+            MDLabel:
+                text:'Welcome!'
+                halign:'center'
+                bold:True
+                size_hint:None, None
+                font_style:'H4'
+                size_hint:1, 5
+                theme_text_color: "Custom"
+                text_color: 1, 1, 1, 1
+
+
+<Student@MDBoxLayout>:
+    radius:9
+    adaptive_height:True
+    name:""
+    icon:"account"
+    pos_x: .7
+    pos_y: .5
+    height:dp(65)
+    md_bg_color:214/255, 223/255, 232/255, 1
+    pos_hint:{"center_x":.5,"top":.8}
+    orientation:"vertical"
+    FloatLayout:
+        MDIcon:
+            icon:root.icon
+            font_size:"35sp"
+            pos_hint:{"center_x":.1,"center_y":.5}
+        MDLabel:
+            id:nm
+            halign:"left"
+            text:root.name
+            font_size:"20sp"
+            theme_text_color: "Custom"
+            text_color:26/255, 54/255, 113/255
+            pos_hint:{"center_x":root.pos_x,"center_y":root.pos_y}
+
+<Atend@MDBoxLayout>:
+    radius:9
+    adaptive_height:True
+    name:""
+    icon:"account"
+    pos_x: .7
+    pos_y: .5
+    height:dp(65)
+    md_bg_color:214/255, 223/255, 232/255, 1
+    pos_hint:{"center_x":.5,"top":.8}
+    orientation:"vertical"
+    FloatLayout:
+        MDIcon:
+            icon:root.icon
+            font_size:"35sp"
+            pos_hint:{"center_x":.1,"center_y":.5}
+        MDLabel:
+            id:nm
+            halign:"left"
+            text:root.name
+            font_size:"20sp"
+            theme_text_color: "Custom"
+            text_color:26/255, 54/255, 113/255
+            pos_hint:{"center_x":root.pos_x,"center_y":root.pos_y}
+        MDIconButton:
+            id:boxs
+            icon:"checkbox-marked-outline"
+            pos_hint:{"center_x":2,"center_y":.5}
+            user_font_size:"55sp"
+            theme_text_color: "Custom"
+            text_color: 36/255, 146/255, 255/255, 1
+             #on_release:
+                #pop.root.id
+                #print(root.id)
+
+        MDIconButton:
+            id:check
+            icon:"checkbox-blank-outline"
+            pos_hint:{"center_x":.9,"center_y":.5}
+            user_font_size:"55sp"
+            theme_text_color: "Custom"
+            text_color: 36/255, 146/255, 255/255, 1
+            on_release:
+                check.pos_hint = {"center_x":3,"center_y":.5}
+                boxs.pos_hint = {"center_x":.9,"center_y":.5}
+                #app. attend_id
+                #print(root.id)
