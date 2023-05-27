@@ -3,18 +3,47 @@
 ScreenManager
     id:manager
     MDScreen:
-        on_enter:
-            app.display_student()
+        name:'home'
+        FloatLayout:
+            orientation:'vertical'
+            MDLabel:
+                bold:True
+                text:'Create Class'
+                halign:"center"
+                font_style:'H6'
+                pos_hint:{'center_x':.5, 'center_y':.8}
+                theme_text_color: "Custom"
+                text_color: 83 / 225, 186 / 225, 115 / 225, 1
+                height: self.texture_size[1]
+                width: self.texture_size[1]
+            MDTextField:
+                id:name
+                mode: "rectangle"
+                fill_color: 0, 0, 0, .4
+                size_hint: .8, .1
+                pos_hint:{'center_x':.5, 'center_y':.7}
+                hint_text:"Class Name:"
+                text_color: 0, 0, 0, 1
+                font_size: dp(20)
+                on_text:
+                    app.class_name = name.text
+            MDFillRoundFlatButton:
+                text: "Add"
+                size_hint: .2, .06
+                pos_hint:{'center_x':.5, 'center_y':.6}
+                md_bg_color: 83 / 225, 186 / 225, 115 / 225, 1
+                on_release:
+                    app.screen_capture("inclass")
+                    app.add_class(name.text)
+    MDScreen:
         name:"inclass"
         MDBoxLayout:
             orientation: "vertical"
             MDTopAppBar:
-                title: "class name"
+                title: app.class_name
                 specific_text_color:78/255, 82/255, 84/255, 1
                 md_bg_color:1, 1, 1, 1
                 right_action_items: [["segment", lambda x: app.screen_capture("activity")]]
-
-
 
             MDTabs:
                 allow_stretch:False
@@ -68,8 +97,13 @@ ScreenManager
                                 size_hint_y: None
                                 height: self.minimum_height
                                 orientation: 'vertical'
-
-
+                        MDFillRoundFlatButton:
+                            text: "Update Attendance"
+                            size_hint: .4, .06
+                            pos_hint:{'center_x':.5, 'center_y':.1}
+                            md_bg_color: 83 / 225, 186 / 225, 115 / 225, 1
+                            on_release:
+                                app.attendance()
     MDScreen:
         name:"activity"
         MDBoxLayout:
@@ -93,7 +127,7 @@ ScreenManager
                     FloatLayout:
                         MDLabel:
                             bold:True
-                            text:'Today Homework'
+                            text:"Today's Homework"
                             halign:"center"
                             font_style:'H6'
                             pos_hint:{'center_x':.5, 'center_y':.9}
@@ -105,16 +139,16 @@ ScreenManager
                             id:cls
                             mode: "rectangle"
                             fill_color: 0, 0, 0, .4
-                            size_hint: .6, .1
+                            size_hint: .6, .11
                             pos_hint:{'center_x':.5, 'center_y':.8}
                             hint_text:"Class Name:"
                             text_color: 0, 0, 0, 1
-                            font_size: dp(15)
+                            font_size: dp(18)
                         MDTextField:
                             id:work
                             mode: "rectangle"
                             fill_color: 0, 0, 0, .4
-                            size_hint: .6, .1
+                            size_hint: .6, .11
                             pos_hint:{'center_x':.5, 'center_y':.67}
                             hint_text:"subject: Math, Eng"
                             text_color: 0, 0, 0, 1
@@ -132,40 +166,6 @@ ScreenManager
                     FloatLayout:
 
 
-
-    MDScreen:
-        name:'home'
-        FloatLayout:
-            orientation:'vertical'
-            MDLabel:
-                bold:True
-                text:'Create Class'
-                halign:"center"
-                font_style:'H6'
-                pos_hint:{'center_x':.5, 'center_y':.8}
-                theme_text_color: "Custom"
-                text_color: 83 / 225, 186 / 225, 115 / 225, 1
-                height: self.texture_size[1]
-                width: self.texture_size[1]
-            MDTextField:
-                id:name
-                mode: "rectangle"
-                fill_color: 0, 0, 0, .4
-                size_hint: .8, .1
-                pos_hint:{'center_x':.5, 'center_y':.7}
-                hint_text:"Class Name:"
-                text_color: 0, 0, 0, 1
-                font_size: dp(20)
-                on_text:
-                    app.class_name = name.text
-            MDFillRoundFlatButton:
-                text: "Add"
-                size_hint: .2, .06
-                pos_hint:{'center_x':.5, 'center_y':.6}
-                md_bg_color: 83 / 225, 186 / 225, 115 / 225, 1
-                on_release:
-                    app.screen_capture("class")
-                    app.add_class(name.text)
 
 
     MDScreen:
@@ -227,38 +227,6 @@ ScreenManager
                 text_color_normal:.5, .5, .5, 1
 
                 Tab:
-                    title: "Search student"
-                    FloatLayout:
-                        MDLabel:
-                            bold:True
-                            text:'Search student'
-                            halign:"center"
-                            font_style:'H6'
-                            pos_hint:{'center_x':.5, 'center_y':.9}
-                            theme_text_color: "Custom"
-                            text_color: 83 / 225, 186 / 225, 115 / 225, 1
-                            height: self.texture_size[1]
-                            width: self.texture_size[1]
-                        MDTextField:
-                            id:student
-                            mode: "rectangle"
-                            fill_color: 0, 0, 0, .4
-                            size_hint: .8, .1
-                            pos_hint:{'center_x':.5, 'center_y':.8}
-                            hint_text:"Student ID:"
-                            text_color: 0, 0, 0, 1
-                            font_size: dp(18)
-                        MDFillRoundFlatButton:
-                            text: "Search"
-                            size_hint: .2, .06
-                            pos_hint:{'center_x':.5, 'center_y':.65}
-                            md_bg_color: 83 / 225, 186 / 225, 115 / 225, 1
-                            on_release:
-                                app.screen_capture("inclass")
-
-
-
-                Tab:
                     title: "Add new student"
                     FloatLayout:
                         MDLabel:
@@ -290,22 +258,13 @@ ScreenManager
                             text_color: 83 / 225, 186 / 225, 115 / 225, 1
                             height: self.texture_size[1]
                             width: self.texture_size[1]
-                        MDTextField:
-                            id:level
-                            mode: "rectangle"
-                            fill_color: 0, 0, 0, .4
-                            size_hint: .8, .1
-                            pos_hint:{'center_x':.5, 'center_y':.65}
-                            hint_text:"Class Name:"
-                            text_color: 0, 0, 0, 1
-                            font_size: dp(20)
 
                         MDTextField:
                             id:student
                             mode: "rectangle"
                             fill_color: 0, 0, 0, .4
                             size_hint: .8, .1
-                            pos_hint:{'center_x':.5, 'center_y':.5}
+                            pos_hint:{'center_x':.5, 'center_y':.67}
                             hint_text:"Student Name:"
                             text_color: 0, 0, 0, 1
                             font_size: dp(20)
@@ -316,18 +275,45 @@ ScreenManager
                             fill_color: 0, 0, 0, .4
                             size_hint: .8, .1
                             hint_text:"Parent phone number:"
-                            pos_hint:{'center_x':.5, 'center_y':.35}
+                            pos_hint:{'center_x':.5, 'center_y':.55}
                             text_color: 0, 0, 0, 1
                             font_size: dp(20)
-
 
                         MDFillRoundFlatButton:
                             text: "Add Student"
                             size_hint: .2, .06
-                            pos_hint:{'center_x':.5, 'center_y':.2}
+                            pos_hint:{'center_x':.5, 'center_y':.41}
                             md_bg_color: 83 / 225, 186 / 225, 115 / 225, 1
                             on_release:
-                                app.add_student(idd.text, level.text, student.text, pphone.text)
+                                app.add_student(idd.text, student.text, pphone.text)
+
+                Tab:
+                    title: "Search student"
+                    FloatLayout:
+                        MDLabel:
+                            bold:True
+                            text:'Search student'
+                            halign:"center"
+                            font_style:'H6'
+                            pos_hint:{'center_x':.5, 'center_y':.9}
+                            theme_text_color: "Custom"
+                            text_color: 83 / 225, 186 / 225, 115 / 225, 1
+                            height: self.texture_size[1]
+                            width: self.texture_size[1]
+                        MDTextField:
+                            id:studen
+                            mode: "rectangle"
+                            fill_color: 0, 0, 0, .4
+                            size_hint: .8, .1
+                            pos_hint:{'center_x':.5, 'center_y':.8}
+                            hint_text:"Student ID:"
+                            text_color: 0, 0, 0, 1
+                            font_size: dp(18)
+                        MDFillRoundFlatButton:
+                            text: "Search"
+                            size_hint: .2, .06
+                            pos_hint:{'center_x':.5, 'center_y':.65}
+                            md_bg_color: 83 / 225, 186 / 225, 115 / 225, 1
 
 
     MDScreen:
@@ -500,9 +486,10 @@ ScreenManager
             user_font_size:"55sp"
             theme_text_color: "Custom"
             text_color: 36/255, 146/255, 255/255, 1
-             #on_release:
-                #pop.root.id
-                #print(root.id)
+            on_release:
+                boxs.pos_hint = {"center_x":3,"center_y":.5}
+                check.pos_hint = {"center_x":.9,"center_y":.5}
+                app.remove_attend(root.id)
 
         MDIconButton:
             id:check
@@ -514,5 +501,29 @@ ScreenManager
             on_release:
                 check.pos_hint = {"center_x":3,"center_y":.5}
                 boxs.pos_hint = {"center_x":.9,"center_y":.5}
-                #app. attend_id
-                #print(root.id)
+                app.attend(root.id)
+
+<Atendx@MDBoxLayout>:
+    radius:9
+    adaptive_height:True
+    name:""
+    icon:"account"
+    pos_x: .7
+    pos_y: .5
+    height:dp(65)
+    md_bg_color:214/255, 223/255, 232/255, 1
+    pos_hint:{"center_x":.5,"top":.8}
+    orientation:"vertical"
+    FloatLayout:
+        MDIcon:
+            icon:root.icon
+            font_size:"35sp"
+            pos_hint:{"center_x":.1,"center_y":.5}
+        MDLabel:
+            id:nm
+            halign:"left"
+            text:root.name
+            font_size:"20sp"
+            theme_text_color: "Custom"
+            text_color:26/255, 54/255, 113/255
+            pos_hint:{"center_x":root.pos_x,"center_y":root.pos_y}

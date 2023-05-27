@@ -1,3 +1,4 @@
+import os
 import random
 import re
 import string
@@ -6,6 +7,7 @@ import phonenumbers
 from kivy import utils
 from kivy.clock import Clock
 from kivy.core.window import Window
+from kivy.core.window.window_x11 import EventLoop
 from kivymd.uix.boxlayout import MDBoxLayout
 from kivymd.uix.tab import MDTabsBase
 
@@ -50,7 +52,7 @@ class MainApp(MDApp):
     user_pin = StringProperty('')
 
     # APP
-    screens = ['entrance']
+    screens = ['inclass']
     screens_size = NumericProperty(len(screens) - 1)
     current = StringProperty(screens[len(screens) - 1])
     t_phone = StringProperty("")
@@ -58,42 +60,137 @@ class MainApp(MDApp):
 
     # class
     class_name = StringProperty("")
-    class_level = StringProperty("class3")
+    class_level = StringProperty("")
+    class_fetch = StringProperty("")
 
     # student
     student_id = StringProperty("")
     attend_id = ListProperty([])
+    read = StringProperty("")
 
     def build(self):
         pass
 
     def on_start(self):
-        pass
-        # self.display_student()
+        self.attend_id = []
+        self.keyboard_hooker()
+        Clock.schedule_once(lambda x: self.register_check(), .1)
 
-    def remember_me(self, phone, dust, name):
-        with open("credential/admin.txt", "w") as fl:
-            fl.write(phone + "\n")
-            fl.write(dust)
-        with open("credential/admin_info.txt", "w") as ui:
-            ui.write(name)
-        fl.close()
-        ui.close()
+
 
     def add_class(self, name):
         TR.classes(TR(), name)
+        self.remember_class(name)
 
-    def get_class(self, classes):
-        self.class_name = TR.get_class(TR(), classes)
 
-    def listen_class(self):
+    def id_generator(self):
+        num = string.digits
+        letter = string.ascii_letters
+
+        rr = num + letter
+
+        z = random.choice(rr)
+        a = random.choice(rr)
+        v = random.choice(rr)
+        f = random.choice(rr)
+        t = random.choice(rr)
+        w = random.choice(rr)
+
+        self.student_id = z + a + v + f + t + w
+
+    def add_student(self, idd, name, phone):
+        TR.add_student(TR(), idd, self.class_name, name, phone)
+
+
+    def get_class(self, mm):
+        print("called")
+        self.display_student()
+        self.display_attendance()
+
+
+
+    def listen_class(self, level):
         import firebase_admin
         firebase_admin._apps.clear()
         from firebase_admin import credentials, initialize_app, db
         if not firebase_admin._apps:
             cred = credentials.Certificate("school-diary-f3a73-firebase-adminsdk-xvqli-73aadbafa6.json")
             initialize_app(cred, {'databaseURL': 'https://school-diary-f3a73-default-rtdb.firebaseio.com/'})
-            ref = db.reference('Diary').child("Teacher").child("classes").listen(self.get_class)
+            self.search = db.reference('Diary').child("classes").child(level).child("students").listen(self.get_class)
+            print("fuction")
+
+
+    def display_student(self):
+        self.root.ids.studs.data = {}
+        students = TR.get_class(TR(), self.class_name)
+
+        if not students:
+            self.root.ids.studs.data.append(
+                {
+                    "viewclass": "Student",
+                    "name": "No student Yet!",
+
+                }
+            )
+        else:
+            for i, y in students.items():
+                self.root.ids.studs.data.append(
+                    {
+                        "viewclass": "Student",
+                        "name": y["Name"]
+
+                    }
+                )
+
+    def display_attendance(self):
+        self.root.ids.attend.data = {}
+        students = TR.get_class(TR(), self.class_name)
+
+        if not students:
+            self.root.ids.attend.data.append(
+                {
+                    "viewclass": "Atendx",
+                    "name": "No student Yet!",
+
+                }
+            )
+        else:
+            for i, y in students.items():
+                self.root.ids.attend.data.append(
+                    {
+                        "viewclass": "Atend",
+                        "name": y["Name"],
+                        "id": i
+
+                    }
+                )
+
+    def upd_homework(self, level, work):
+        if level == "":
+            toast("Enter class name")
+
+        elif work == "":
+            toast("Enter homework")
+
+        else:
+            TR.update_homework(TR(), level, work)
+            toast("updated")
+
+    def attend(self, save):
+        self.attend_id.append(save)
+        print(self.attend_id)
+
+    def remove_attend(self, stud):
+
+        self.attend_id.remove(stud)
+        print(self.attend_id)
+
+    def attendance(self):
+        if not self.attend_id:
+            toast("Select Students")
+        else:
+            TR.update_attendance(TR(), self.read, self.attend_id)
+            toast("Attendance accepted")
 
     def validate_user(self, phone, name):
         if not self.phone_number_check_admin(phone):
@@ -142,85 +239,55 @@ class MainApp(MDApp):
             toast("enter phone number!")
 
     def register_caller(self, phone, name):
-        from database import Transfer as TR
         try:
             TR.register(TR(), phone, name)
             self.screen_capture("home")
         except:
             toast('OPPs!, No connection')
 
-    def id_generator(self):
-        num = string.digits
-        letter = string.ascii_letters
+    def remember_class(self, name):
+        with open("class.txt", "w") as fl:
+            fl.write(name)
+            self.class_name = name
+        fl.close()
 
-        rr = num + letter
-
-        z = random.choice(rr)
-        a = random.choice(rr)
-        v = random.choice(rr)
-        f = random.choice(rr)
-        t = random.choice(rr)
-        w = random.choice(rr)
-
-        self.student_id = z + a + v + f + t + w
-
-    def add_student(self, idd, level, name, phone):
-        TR.add_student(TR(), idd, level, name, phone)
-        self.class_level = level
-
-    def display_student(self):
-        self.root.ids.studs.data = {}
-        students = TR.get_class(TR(), self.class_level)
-
-        if not students:
-            self.root.ids.studs.data.append(
-                {
-                    "viewclass": "Student",
-                    "name": "No student Yet!",
-                    "route": "",
-                    "lcn": "",
-                    "price": "",
-                    "seats": ""
-                }
-            )
-            self.root.ids.attend.data.append(
-                {
-                    "viewclass": "Atend",
-                    "name": "No student Yet!",
-                    "route": "",
-                    "lcn": "",
-                    "price": "",
-                    "seats": ""
-                }
-            )
+    def register_check(self):
+        sm = self.root
+        file_size = os.path.getsize("class.txt")
+        if file_size == 0:
+            pass
         else:
-            for i, y in students.items():
-                self.root.ids.studs.data.append(
-                    {
-                        "viewclass": "Student",
-                        "name": y["Name"]
+            self.readf()
 
-                    }
-                )
-            for i, y in students.items():
-                self.root.ids.attend.data.append(
-                    {
-                        "viewclass": "Atend",
-                        "name": y["Name"],
-                        "id": i
 
-                    }
-                )
+    def readf(self):
+        with open("class.txt", "r") as fl:
+            read = fl.readlines()
+            self.read = read[0]
+            self.class_name = self.read
+            self.listen_class(self.class_name)
+            self.screen_capture("inclass")
 
-    def upd_homework(self, level, work):
-        if level == "":
-            toast("Enter class level")
 
-        elif work == "":
-            toast("Enter work")
+        fl.close()
 
-        else:
-            TR.update_homework(TR(), level, work)
+    def keyboard_hooker(self, *args):
+        EventLoop.window.bind(on_keyboard=self.hook_keyboard)
+
+    def hook_keyboard(self, window, key, *largs):
+        print(self.screens_size)
+        if key == 27 and self.screens_size > 0:
+            print(f"your were in {self.current}")
+            last_screens = self.current
+            self.screens.remove(last_screens)
+            print(self.screens)
+            self.screens_size = len(self.screens) - 1
+            self.current = self.screens[len(self.screens) - 1]
+            self.screen_capture(self.current)
+            return True
+        elif key == 27 and self.screens_size == 0:
+            toast('Press Home button!')
+            return True
 
     def screen_capture(self, screen):
         sm = self.root
