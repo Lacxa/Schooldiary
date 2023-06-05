@@ -6,6 +6,7 @@ import string
 import phonenumbers
 from kivy import utils
 from kivy.clock import Clock
+from beem import sms as SM
 from kivy.core.window import Window
 from kivy.core.window.window_x11 import EventLoop
 from kivymd.uix.boxlayout import MDBoxLayout
@@ -50,6 +51,7 @@ class NumberOnlyField(MDTextField):
 
 class MainApp(MDApp):
     user_pin = StringProperty('')
+    size_x, size_y = Window.size
 
     # APP
     screens = ['inclass']
@@ -57,6 +59,8 @@ class MainApp(MDApp):
     current = StringProperty(screens[len(screens) - 1])
     t_phone = StringProperty("")
     t_name = StringProperty("")
+
+    phone = StringProperty("")
 
     # class
     class_name = StringProperty("")
@@ -67,6 +71,7 @@ class MainApp(MDApp):
     student_id = StringProperty("")
     attend_id = ListProperty([])
     read = StringProperty("")
+    stidd = StringProperty("")
 
     def build(self):
         pass
@@ -76,12 +81,9 @@ class MainApp(MDApp):
         self.keyboard_hooker()
         Clock.schedule_once(lambda x: self.register_check(), .1)
 
-
-
     def add_class(self, name):
         TR.classes(TR(), name)
         self.remember_class(name)
-
 
     def id_generator(self):
         num = string.digits
@@ -101,13 +103,11 @@ class MainApp(MDApp):
     def add_student(self, idd, name, phone):
         TR.add_student(TR(), idd, self.class_name, name, phone)
 
-
     def get_class(self, mm):
         print("called")
         self.display_student()
         self.display_attendance()
-
-
+        self.display_result()
 
     def listen_class(self, level):
         import firebase_admin
@@ -119,6 +119,14 @@ class MainApp(MDApp):
             self.search = db.reference('Diary').child("classes").child(level).child("students").listen(self.get_class)
             print("fuction")
 
+    def send_txt(self, sms):
+        data = TR.get_phone_number(TR(), self.class_name)
+        for i, y in data.items():
+            self.phone = y["Parent_Phone"]
+            print(self.phone)
+
+            if SM.send_sms(self.phone, sms):
+                toast("send successful")
 
     def display_student(self):
         self.root.ids.studs.data = {}
@@ -137,7 +145,8 @@ class MainApp(MDApp):
                 self.root.ids.studs.data.append(
                     {
                         "viewclass": "Student",
-                        "name": y["Name"]
+                        "name": y["Name"],
+                        "id": i
 
                     }
                 )
@@ -165,20 +174,47 @@ class MainApp(MDApp):
                     }
                 )
 
-    def upd_homework(self, level, work):
-        if level == "":
-            toast("Enter class name")
+    def display_result(self):
+        self.root.ids.results.data = {}
+        students = TR.get_class(TR(), self.class_name)
 
-        elif work == "":
+        if not students:
+            self.root.ids.results.data.append(
+                {
+                    "viewclass": "Result",
+                    "name": "No student Yet!",
+
+                }
+            )
+        else:
+            for i, y in students.items():
+                self.root.ids.results.data.append(
+                    {
+                        "viewclass": "Result",
+                        "name": y["Name"],
+                        "idd": i
+
+                    }
+                )
+
+    def upd_homework(self, work):
+        if work == "":
             toast("Enter homework")
 
         else:
-            TR.update_homework(TR(), level, work)
+            TR.update_homework(TR(), self.class_name, work)
             toast("updated")
+
+    def update_result(self, math, eng, history, science, geo):
+        TR.update_result(TR(), self.class_name, self.stidd, math, eng, history, science, geo)
 
     def attend(self, save):
         self.attend_id.append(save)
         print(self.attend_id)
+
+    def student(self, idd):
+        self.stidd = idd
+        print(self.stidd)
 
     def remove_attend(self, stud):
 
@@ -259,7 +295,6 @@ class MainApp(MDApp):
         else:
             self.readf()
 
-
     def readf(self):
         with open("class.txt", "r") as fl:
             read = fl.readlines()
@@ -267,7 +302,6 @@ class MainApp(MDApp):
             self.class_name = self.read
             self.listen_class(self.class_name)
             self.screen_capture("inclass")
-
 
         fl.close()
 
