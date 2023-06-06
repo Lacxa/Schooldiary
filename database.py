@@ -1,5 +1,7 @@
 from datetime import datetime
 
+from kivymd.toast import toast
+
 
 class Transfer:
     current_time = str(datetime.now())
@@ -37,7 +39,7 @@ class Transfer:
             if not firebase_admin._apps:
                 cred = credentials.Certificate("school-diary-f3a73-firebase-adminsdk-xvqli-73aadbafa6.json")
                 initialize_app(cred, {'databaseURL': 'https://school-diary-f3a73-default-rtdb.firebaseio.com/'})
-                ref = db.reference('Diary').child("Teacher").child(phone)
+                ref = db.reference('Diary').child("Teacher")
 
                 data = ref.get()
 
@@ -87,6 +89,8 @@ class Transfer:
                         "Parent_Phone": phone,
                     }
                 )
+                toast("student added")
+
 
     def get_class(self, level):
         if True:

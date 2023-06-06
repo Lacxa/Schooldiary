@@ -101,7 +101,12 @@ class MainApp(MDApp):
         self.student_id = z + a + v + f + t + w
 
     def add_student(self, idd, name, phone):
-        TR.add_student(TR(), idd, self.class_name, name, phone)
+        if not self.phone_number_check_admin(phone):
+            toast("Enter valid phone number")
+        elif name == "":
+            toast("Enter name")
+        else:
+            TR.add_student(TR(), idd, self.class_name, name, phone)
 
     def get_class(self, mm):
         print("called")
@@ -230,7 +235,7 @@ class MainApp(MDApp):
 
     def validate_user(self, phone, name):
         if not self.phone_number_check_admin(phone):
-            toast("please enter your phone number correctly")
+            toast("Enter your phone number correctly")
         elif name == "":
             toast("please enter your password")
         else:
@@ -239,6 +244,7 @@ class MainApp(MDApp):
             self.phone_verify(phone)
 
     def user_login(self, phone, passe):
+
         if TR.get_login(TR(), phone, passe):
             self.screen_capture("home")
         else:
@@ -252,7 +258,6 @@ class MainApp(MDApp):
     def verify(self, pin):
         if tp.req.verfy(tp.req(), pin):
             Clock.schedule_once(lambda x: self.register_caller(self.t_phone, self.t_name), 1)
-            self.screen_capture("login")
         else:
             toast("Try again")
 
@@ -277,7 +282,7 @@ class MainApp(MDApp):
     def register_caller(self, phone, name):
         try:
             TR.register(TR(), phone, name)
-            self.screen_capture("home")
+            self.screen_capture("login")
         except:
             toast('OPPs!, No connection')
 
